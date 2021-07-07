@@ -4,7 +4,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('../config');
-const v1 = require('../api/v1');
+const api = require('../api');
 const { notFound, errorHandler } = require('../middlewares/errors');
 
 const { CLIENT_URL } = config;
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
 app.use(cors({ origin: CLIENT_URL }));
 
-app.use('/api/v1', v1);
+app.use('/api', api);
 
 app.use(notFound);
 app.use(errorHandler);
