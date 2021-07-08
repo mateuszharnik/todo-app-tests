@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const config = require('../config');
-const User = require('./index.model');
+const User = require('../api/v1/users/index.model');
 const { validateSignInCredentials, validateSignUpCredentials } = require('./index.schema');
 const { responseWithError } = require('../helpers/errors');
 
@@ -80,6 +79,7 @@ const signUp = async (req, res, next) => {
       avatar: createdUser.avatar,
       created_at: createdUser.created_at,
       updated_at: createdUser.updated_at,
+      deleted_at: createdUser.deleted_at,
     };
 
     const token = await signToken(payload, '1d');
@@ -107,6 +107,7 @@ const signIn = async (req, res, next) => {
   try {
     const user = await User.findOne({
       $or: [{ username: data.username }, { email: data.email }],
+      deleted_at: null,
     });
 
     if (!user) {
@@ -120,12 +121,13 @@ const signIn = async (req, res, next) => {
     }
 
     const payload = {
-      id: user._id,
+      id: user.id,
       username: user.username,
       email: user.email,
       avatar: user.avatar,
       created_at: user.created_at,
       updated_at: user.updated_at,
+      deleted_at: user.deleted_at,
     };
 
     const token = await signToken(payload, '1d');
