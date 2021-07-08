@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const config = require('../config');
 const api = require('../api');
 const { notFound, errorHandler } = require('../middlewares/errors');
+const { checkToken } = require('../middlewares/auth');
 
 const { CLIENT_URL } = config;
 
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
 app.use(cors({ origin: CLIENT_URL }));
+app.use(checkToken);
 
 app.use('/api', api);
 

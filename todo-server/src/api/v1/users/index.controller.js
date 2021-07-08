@@ -18,6 +18,10 @@ const getUser = async (req, res, next) => {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
     }
 
+    if (user.id.toString() !== req.user.id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
+    }
+
     return res.status(200).json(user);
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -46,6 +50,10 @@ const updateEmail = async (req, res, next) => {
 
     if (!user) {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
+    }
+
+    if (user.id.toString() !== req.user.id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
     if (user.email === data.email) {
@@ -106,6 +114,10 @@ const updateUsername = async (req, res, next) => {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
     }
 
+    if (user.id.toString() !== req.user.id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
+    }
+
     if (user.username === data.username) {
       return res.status(200).json(user);
     }
@@ -162,6 +174,10 @@ const updatePassword = async (req, res, next) => {
 
     if (!user) {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
+    }
+
+    if (user.id.toString() !== req.user.id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -228,6 +244,10 @@ const deleteUser = async (req, res, next) => {
 
     if (!user) {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
+    }
+
+    if (user.id.toString() !== req.user.id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
     const isPasswordCorrect = await bcrypt.compare(data.password, user.password);

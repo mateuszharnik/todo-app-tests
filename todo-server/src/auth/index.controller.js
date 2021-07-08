@@ -1,21 +1,8 @@
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const config = require('../config');
 const User = require('../api/v1/users/index.model');
 const { validateSignInCredentials, validateSignUpCredentials } = require('./index.schema');
 const { responseWithError } = require('../helpers/errors');
-
-const { SECRET } = config;
-
-const signToken = (payload = {}, expiresIn = '1d') => new Promise((resolve, reject) => {
-  jwt.sign(payload, SECRET, { expiresIn }, (error, token) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(token);
-    }
-  });
-});
+const { signToken } = require('../middlewares/auth');
 
 const signUp = async (req, res, next) => {
   const { validationError, data } = validateSignUpCredentials(req.body);
