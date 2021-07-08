@@ -7,14 +7,15 @@ const {
   updateAvatar,
   deleteUser,
 } = require('./index.controller');
+const { isNotLoggedIn } = require('../../../middlewares/auth');
 
 const router = Router();
 
-router.get('/:id', getUser);
-router.patch('/:id/email', updateEmail);
-router.patch('/:id/username', updateUsername);
-router.patch('/:id/password', updatePassword);
-router.patch('/:id/avatar', updateAvatar);
-router.delete('/:id', deleteUser);
+router.get('/:id', isNotLoggedIn, getUser);
+router.patch('/:id/email', isNotLoggedIn, updateEmail);
+router.patch('/:id/username', isNotLoggedIn, updateUsername);
+router.patch('/:id/password', isNotLoggedIn, updatePassword);
+router.patch('/:id/avatar', isNotLoggedIn, updateAvatar);
+router.delete('/:id', isNotLoggedIn, deleteUser);
 
 module.exports = router;
