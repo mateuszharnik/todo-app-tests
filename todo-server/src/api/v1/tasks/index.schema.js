@@ -1,10 +1,15 @@
 const Joi = require('joi');
 const { dbIdRegExp } = require('../../../helpers/regexps');
-const { descriptionMessages } = require('../../../helpers/validation/messages/description');
+const { boardIdMessages } = require('../../../helpers/validation/messages/boardID');
 const { titleMessages } = require('../../../helpers/validation/messages/title');
-const { userIdMessages } = require('../../../helpers/validation/messages/userID');
+const {
+  descriptionMessages,
+} = require('../../../helpers/validation/messages/description');
+const {
+  userIdMessages,
+} = require('../../../helpers/validation/messages/userID');
 
-const validateBoard = (board = {}) => {
+const validateTask = (task = {}) => {
   const schema = Joi.object().keys({
     title: Joi.string()
       .trim()
@@ -23,13 +28,18 @@ const validateBoard = (board = {}) => {
       .regex(dbIdRegExp)
       .messages(userIdMessages)
       .required(),
+    board_id: Joi.string()
+      .trim()
+      .regex(dbIdRegExp)
+      .messages(boardIdMessages)
+      .required(),
   });
 
-  const { error: validationError, value: data } = schema.validate(board);
+  const { error: validationError, value: data } = schema.validate(task);
 
   return { validationError, data };
 };
 
 module.exports = {
-  validateBoard,
+  validateTask,
 };

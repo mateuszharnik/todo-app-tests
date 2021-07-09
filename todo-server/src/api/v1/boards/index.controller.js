@@ -1,16 +1,28 @@
 const Board = require('./index.model');
+const Task = require('../tasks/index.model');
 const { validateBoard } = require('./index.schema');
 const { responseWithError } = require('../../../helpers/errors');
+const { validateDbId } = require('../../../helpers/schemas');
+const { boardIdMessages } = require('../../../helpers/validation/messages/boardID');
 
 const getBoard = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: boardIdError } = validateDbId(_id, boardIdMessages);
+
+  if (boardIdError) {
+    return responseWithError(res, next, 409, boardIdError.details[0].message);
+  }
+
   try {
-    const board = await Board.findOne({ _id: req.params.id, deleted_at: null });
+    const board = await Board.findOne({ _id, deleted_at: null });
 
     if (!board) {
       return responseWithError(res, next, 404, 'Tablica nie istnieje.');
     }
 
-    if (board.user_id.toString() !== req.user.id) {
+    if (board.user_id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
@@ -23,10 +35,12 @@ const getBoard = async (req, res, next) => {
 };
 
 const getBoards = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+
   try {
-    const boards = await Board
-      .find({ user_id: req.user.id, deleted_at: null })
-      .sort({ created_at: -1 });
+    const boards = await Board.find({ user_id, deleted_at: null }).sort({
+      created_at: -1,
+    });
 
     if (!boards.length) {
       return responseWithError(res, next, 404, 'Brak tablic.');
@@ -41,11 +55,11 @@ const getBoards = async (req, res, next) => {
 };
 
 const createBoard = async (req, res, next) => {
-  const { id = '' } = req.user || {};
+  const { id: user_id = '' } = req.user || {};
 
   const { validationError, data } = validateBoard({
     ...req.body,
-    user_id: id,
+    user_id,
   });
 
   if (validationError) {
@@ -60,6 +74,7 @@ const createBoard = async (req, res, next) => {
   try {
     const board = {
       ...data,
+      tasks_count: 0,
       deleted_at: null,
     };
 
@@ -83,41 +98,51 @@ const createBoard = async (req, res, next) => {
 };
 
 const updateBoard = async (req, res, next) => {
-  const { id = '' } = req.user || {};
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
 
-  const { validationError, data } = validateBoard({
-    ...req.body,
-    user_id: id,
-  });
+  const { validationError: boardIdError } = validateDbId(_id, boardIdMessages);
 
-  if (validationError) {
-    return responseWithError(res, next, 409, validationError.details[0].message);
+  if (boardIdError) {
+    return responseWithError(res, next, 409, boardIdError.details[0].message);
   }
 
   try {
-    const board = await Board.findOne({ _id: req.params.id, deleted_at: null });
+    const board = await Board.findOne({ _id, deleted_at: null });
 
     if (!board) {
-      return responseWithError(
-        res,
-        next,
-        404,
-        'Tablica nie istnieje.',
-      );
+      return responseWithError(res, next, 404, 'Tablica nie istnieje.');
     }
 
-    if (board.user_id.toString() !== req.user.id) {
+    if (board.user_id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
-    const updatedBoard = await Board.findByIdAndUpdate(
-      req.params.id,
-      data,
-      { new: true },
-    );
+    const { validationError, data } = validateBoard({
+      ...req.body,
+      user_id: board.user_id.toString(),
+    });
+
+    if (validationError) {
+      return responseWithError(
+        res,
+        next,
+        409,
+        validationError.details[0].message,
+      );
+    }
+
+    const updatedBoard = await Board.findByIdAndUpdate(_id, data, {
+      new: true,
+    });
 
     if (!updatedBoard) {
-      return responseWithError(res, next, 409, 'Nie udało się zaktualizować tablicy.');
+      return responseWithError(
+        res,
+        next,
+        409,
+        'Nie udało się zaktualizować tablicy.',
+      );
     }
 
     return res.status(200).json(updatedBoard);
@@ -129,19 +154,37 @@ const updateBoard = async (req, res, next) => {
 };
 
 const deleteBoard = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: boardIdError } = validateDbId(_id, boardIdMessages);
+
+  if (boardIdError) {
+    return responseWithError(res, next, 409, boardIdError.details[0].message);
+  }
+
   try {
-    const board = await Board.findOne({ _id: req.params.id, deleted_at: null });
+    const board = await Board.findOne({ _id, deleted_at: null });
 
     if (!board) {
       return responseWithError(res, next, 404, 'Tablica nie istnieje.');
     }
 
-    if (board.user_id.toString() !== req.user.id) {
+    if (board.user_id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
+    const deletedTasks = await Task.updateMany(
+      { board_id: _id },
+      { deleted_at: Date.now() },
+    );
+
+    if (!deletedTasks) {
+      return responseWithError(res, next, 409, 'Nie udało się usunąć zadań z tablicy.');
+    }
+
     const deletedBoard = await Board.findByIdAndUpdate(
-      req.params.id,
+      _id,
       { deleted_at: Date.now() },
       { new: true },
     );
