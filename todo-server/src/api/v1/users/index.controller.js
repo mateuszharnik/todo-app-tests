@@ -7,18 +7,32 @@ const {
   validatePasswords,
 } = require('./index.schema');
 const { responseWithError } = require('../../../helpers/errors');
+const { userIdMessages } = require('../../../helpers/validation/messages/userID');
+const { validateDbId } = require('../../../helpers/schemas');
 
 const getUser = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: userIdError } = validateDbId(
+    _id,
+    userIdMessages,
+  );
+
+  if (userIdError) {
+    return responseWithError(res, next, 409, userIdError.details[0].message);
+  }
+
   try {
     const user = await User.findOne({
-      _id: req.params.id, deleted_at: null,
+      _id, deleted_at: null,
     }).select('-password');
 
     if (!user) {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
     }
 
-    if (user.id.toString() !== req.user.id) {
+    if (user.id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
@@ -31,6 +45,15 @@ const getUser = async (req, res, next) => {
 };
 
 const updateEmail = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: userIdError } = validateDbId(_id, userIdMessages);
+
+  if (userIdError) {
+    return responseWithError(res, next, 409, userIdError.details[0].message);
+  }
+
   const { validationError, data } = validateEmail(req.body);
 
   if (validationError) {
@@ -44,7 +67,7 @@ const updateEmail = async (req, res, next) => {
 
   try {
     const user = await User.findOne({
-      _id: req.params.id,
+      _id,
       deleted_at: null,
     }).select('-password');
 
@@ -52,7 +75,7 @@ const updateEmail = async (req, res, next) => {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
     }
 
-    if (user.id.toString() !== req.user.id) {
+    if (user.id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
@@ -70,7 +93,7 @@ const updateEmail = async (req, res, next) => {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      _id,
       { email: data.email },
       { new: true },
     ).select('-password');
@@ -93,6 +116,15 @@ const updateEmail = async (req, res, next) => {
 };
 
 const updateUsername = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: userIdError } = validateDbId(_id, userIdMessages);
+
+  if (userIdError) {
+    return responseWithError(res, next, 409, userIdError.details[0].message);
+  }
+
   const { validationError, data } = validateUsername(req.body);
 
   if (validationError) {
@@ -106,7 +138,7 @@ const updateUsername = async (req, res, next) => {
 
   try {
     const user = await User.findOne({
-      _id: req.params.id,
+      _id,
       deleted_at: null,
     }).select('-password');
 
@@ -114,7 +146,7 @@ const updateUsername = async (req, res, next) => {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
     }
 
-    if (user.id.toString() !== req.user.id) {
+    if (user.id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
@@ -132,7 +164,7 @@ const updateUsername = async (req, res, next) => {
     }
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      _id,
       { username: data.username },
       { new: true },
     ).select('-password');
@@ -155,6 +187,15 @@ const updateUsername = async (req, res, next) => {
 };
 
 const updatePassword = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: userIdError } = validateDbId(_id, userIdMessages);
+
+  if (userIdError) {
+    return responseWithError(res, next, 409, userIdError.details[0].message);
+  }
+
   const { validationError, data } = validatePasswords(req.body);
 
   if (validationError) {
@@ -168,7 +209,7 @@ const updatePassword = async (req, res, next) => {
 
   try {
     const user = await User.findOne({
-      _id: req.params.id,
+      _id,
       deleted_at: null,
     });
 
@@ -176,7 +217,7 @@ const updatePassword = async (req, res, next) => {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
     }
 
-    if (user.id.toString() !== req.user.id) {
+    if (user.id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
@@ -192,7 +233,7 @@ const updatePassword = async (req, res, next) => {
     const password = await bcrypt.hash(data.new_password, 12);
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      _id,
       { password },
       { new: true },
     ).select('-password');
@@ -225,6 +266,15 @@ const updateAvatar = async (req, res, next) => {
 };
 
 const deleteUser = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: userIdError } = validateDbId(_id, userIdMessages);
+
+  if (userIdError) {
+    return responseWithError(res, next, 409, userIdError.details[0].message);
+  }
+
   const { validationError, data } = validatePassword(req.body);
 
   if (validationError) {
@@ -238,7 +288,7 @@ const deleteUser = async (req, res, next) => {
 
   try {
     const user = await User.findOne({
-      _id: req.params.id,
+      _id,
       deleted_at: null,
     });
 
@@ -246,7 +296,7 @@ const deleteUser = async (req, res, next) => {
       return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
     }
 
-    if (user.id.toString() !== req.user.id) {
+    if (user.id.toString() !== user_id) {
       return responseWithError(res, next, 403, 'Brak dostępu.');
     }
 
@@ -257,7 +307,7 @@ const deleteUser = async (req, res, next) => {
     }
 
     const deletedUser = await User.findByIdAndUpdate(
-      req.params.id,
+      _id,
       { deleted_at: Date.now() },
       { new: true },
     ).select('-password');

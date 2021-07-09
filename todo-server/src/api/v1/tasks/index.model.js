@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const BoardSchema = new Schema(
+const TaskSchema = new Schema(
   {
     title: {
       type: String,
@@ -12,11 +12,11 @@ const BoardSchema = new Schema(
       type: String,
       maxlength: 10000,
     },
-    tasks_count: {
-      type: Number,
+    user_id: {
+      type: Schema.Types.ObjectId,
       required: true,
     },
-    user_id: {
+    board_id: {
       type: Schema.Types.ObjectId,
       required: true,
     },
@@ -33,7 +33,7 @@ const BoardSchema = new Schema(
   },
 );
 
-BoardSchema.set('toJSON', {
+TaskSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
   transform: (_, obj) => {
@@ -45,4 +45,4 @@ BoardSchema.set('toJSON', {
   },
 });
 
-module.exports = model('Board', BoardSchema);
+module.exports = model('Task', TaskSchema);
