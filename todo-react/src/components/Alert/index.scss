@@ -1,0 +1,30 @@
+@import "../../assets/scss/variables";
+
+.alert {
+  padding: 10px;
+  margin: 0px auto;
+
+  &__danger {
+    background: color("red", "lighten-3");
+    color: color("red", "darken-4");
+    border: 1px solid color("red", "darken-4");
+  }
+
+  &__warning {
+    background: color("yellow", "lighten-3");
+    color: color("yellow", "darken-4");
+    border: 1px solid color("yellow", "darken-4");
+  }
+
+  &__success {
+    background: color("green", "lighten-3");
+    color: color("green", "darken-4");
+    border: 1px solid color("green", "darken-4");
+  }
+
+  &__info {
+    background: color("light-blue", "lighten-3");
+    color: color("light-blue", "darken-4");
+    border: 1px solid color("light-blue", "darken-4");
+  }
+}

@@ -1,0 +1,20 @@
+@import "../../assets/scss/variables";
+
+.auth-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: $secondary-color;
+  background-image: linear-gradient(
+    45deg,
+    $secondary-color,
+    darken($secondary-color, 24%)
+  );
+
+  @media (min-width: $small-screen-up) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0px;
+  }
+}

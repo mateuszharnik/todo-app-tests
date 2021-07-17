@@ -1,0 +1,16 @@
+@import "../../assets/scss/variables";
+
+.not-found-page {
+  position: relative;
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__image {
+    width: 100%;
+    max-width: 400px;
+    margin: 0px auto 20px;
+  }
+}
