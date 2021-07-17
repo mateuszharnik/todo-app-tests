@@ -5,6 +5,6 @@ const { isLoggedIn } = require('../middlewares/auth');
 const router = Router();
 
 router.post('/sign-up', isLoggedIn, signUp);
-router.get('/sign-in', isLoggedIn, signIn);
+router.post('/sign-in', isLoggedIn, signIn);
 
 module.exports = router;
