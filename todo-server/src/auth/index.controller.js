@@ -50,6 +50,7 @@ const signUp = async (req, res, next) => {
       email: data.email,
       avatar: '',
       password: await bcrypt.hash(data.password, 12),
+      gender: data.gender,
       deleted_at: null,
     };
 
@@ -64,6 +65,7 @@ const signUp = async (req, res, next) => {
       username: createdUser.username,
       email: createdUser.email,
       avatar: createdUser.avatar,
+      gender: createdUser.gender,
       created_at: createdUser.created_at,
       updated_at: createdUser.updated_at,
       deleted_at: createdUser.deleted_at,
@@ -112,6 +114,7 @@ const signIn = async (req, res, next) => {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
+      gender: user.gender,
       created_at: user.created_at,
       updated_at: user.updated_at,
       deleted_at: user.deleted_at,

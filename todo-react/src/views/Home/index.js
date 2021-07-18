@@ -128,7 +128,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   handleFetchAndSetUser: (id = '', token = '') => {
-    dispatch(fetchAndSetUser(id, token));
+    dispatch(fetchAndSetUser({ id, token }));
   },
 });
 

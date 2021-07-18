@@ -1,5 +1,6 @@
 const Board = require('./index.model');
 const Task = require('../tasks/index.model');
+const purify = require('../../../helpers/purify');
 const { validateBoard } = require('./index.schema');
 const { responseWithError } = require('../../../helpers/errors');
 const { validateDbId } = require('../../../helpers/schemas');
@@ -71,9 +72,32 @@ const createBoard = async (req, res, next) => {
     );
   }
 
+  const purify_title = purify(data.title);
+  const purify_description = purify(data.description);
+
+  if (!purify_title) {
+    return responseWithError(
+      res,
+      next,
+      409,
+      'Tytuł zawiera niebezpieczne znaki. Proszę podać inny tytuł.',
+    );
+  }
+
+  if (!purify_description) {
+    return responseWithError(
+      res,
+      next,
+      409,
+      'Opis zawiera niebezpieczne znaki. Proszę podać inny opis.',
+    );
+  }
+
   try {
     const board = {
       ...data,
+      purify_title,
+      purify_description,
       tasks_count: 0,
       deleted_at: null,
     };
@@ -132,9 +156,36 @@ const updateBoard = async (req, res, next) => {
       );
     }
 
-    const updatedBoard = await Board.findByIdAndUpdate(_id, data, {
-      new: true,
-    });
+    const purify_title = purify(data.title);
+    const purify_description = purify(data.description);
+
+    if (!purify_title) {
+      return responseWithError(
+        res,
+        next,
+        409,
+        'Tytuł zawiera niebezpieczne znaki. Proszę podać inny tytuł.',
+      );
+    }
+
+    if (!purify_description) {
+      return responseWithError(
+        res,
+        next,
+        409,
+        'Opis zawiera niebezpieczne znaki. Proszę podać inny opis.',
+      );
+    }
+
+    const updatedBoard = await Board.findByIdAndUpdate(
+      _id,
+      {
+        ...data,
+        purify_title,
+        purify_description,
+      },
+      { new: true },
+    );
 
     if (!updatedBoard) {
       return responseWithError(

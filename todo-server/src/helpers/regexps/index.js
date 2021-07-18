@@ -6,9 +6,12 @@ const passwordRegExp = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[a-zA-
 
 const dbIdRegExp = /^[a-f\d]{24}$/i;
 
+const mimetypeRegExp = /^image\/(jpeg|jpg|png)$/;
+
 module.exports = {
   usernameRegExp,
   emailRegExp,
   passwordRegExp,
   dbIdRegExp,
+  mimetypeRegExp,
 };

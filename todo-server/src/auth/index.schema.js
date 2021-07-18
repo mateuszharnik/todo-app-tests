@@ -3,6 +3,7 @@ const { emailRegExp, passwordRegExp } = require('../helpers/regexps');
 const { termsOfUseMessages } = require('../helpers/validation/messages');
 const { confirmPasswordMessages } = require('../helpers/validation/messages/confirmPassword');
 const { emailMessages } = require('../helpers/validation/messages/email');
+const { genderMessages } = require('../helpers/validation/messages/gender');
 const { passwordMessages, createPasswordMessages } = require('../helpers/validation/messages/password');
 const { usernameMessages, createUsernameMessages } = require('../helpers/validation/messages/username');
 
@@ -21,6 +22,12 @@ const validateSignUpCredentials = (credentials = {}) => {
       .regex(emailRegExp)
       .lowercase()
       .messages(emailMessages)
+      .required(),
+    gender: Joi.string()
+      .trim()
+      .lowercase()
+      .valid('male', 'female')
+      .messages(genderMessages)
       .required(),
     password: Joi.string()
       .trim()

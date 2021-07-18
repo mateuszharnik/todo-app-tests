@@ -1,14 +1,15 @@
 const bcrypt = require('bcryptjs');
 const User = require('./index.model');
+const { responseWithError } = require('../../../helpers/errors');
+const { userIdMessages } = require('../../../helpers/validation/messages/userID');
+const { validateDbId } = require('../../../helpers/schemas');
 const {
   validateEmail,
   validateUsername,
   validatePassword,
   validatePasswords,
+  validateAvatar,
 } = require('./index.schema');
-const { responseWithError } = require('../../../helpers/errors');
-const { userIdMessages } = require('../../../helpers/validation/messages/userID');
-const { validateDbId } = require('../../../helpers/schemas');
 
 const getUser = async (req, res, next) => {
   const { id: user_id = '' } = req.user || {};
@@ -256,8 +257,112 @@ const updatePassword = async (req, res, next) => {
 };
 
 const updateAvatar = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: userIdError } = validateDbId(_id, userIdMessages);
+
+  if (userIdError) {
+    return responseWithError(res, next, 409, userIdError.details[0].message);
+  }
+
+  const { avatar = {} } = req.files || {};
+  const { data: buffer, mimetype, size } = avatar;
+
+  req.body = {
+    buffer,
+    mimetype,
+    size,
+  };
+
+  const { validationError, data } = validateAvatar(req.body);
+
+  if (validationError) {
+    return responseWithError(
+      res,
+      next,
+      409,
+      validationError.details[0].message,
+    );
+  }
+
   try {
-    return res.status(200).json({ message: 'OK' });
+    const user = await User.findOne({
+      _id,
+      deleted_at: null,
+    }).select('-password');
+
+    if (!user) {
+      return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
+    }
+
+    if (user.id.toString() !== user_id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      { avatar: data.buffer },
+      { new: true },
+    ).select('-password');
+
+    if (!updatedUser) {
+      return responseWithError(
+        res,
+        next,
+        409,
+        'Nie udało się zmienić awatara użytkownika.',
+      );
+    }
+
+    return res.status(200).json(updatedUser);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return responseWithError(res, next, 500, 'Wystąpił błąd.');
+  }
+};
+
+const deleteAvatar = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: userIdError } = validateDbId(_id, userIdMessages);
+
+  if (userIdError) {
+    return responseWithError(res, next, 409, userIdError.details[0].message);
+  }
+
+  try {
+    const user = await User.findOne({
+      _id,
+      deleted_at: null,
+    }).select('-password');
+
+    if (!user) {
+      return responseWithError(res, next, 404, 'Użytkownik nie istnieje.');
+    }
+
+    if (user.id.toString() !== user_id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      { avatar: '' },
+      { new: true },
+    ).select('-password');
+
+    if (!updatedUser) {
+      return responseWithError(
+        res,
+        next,
+        409,
+        'Nie udało się usunąć awatara użytkownika.',
+      );
+    }
+
+    return res.status(200).json(updatedUser);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -330,5 +435,6 @@ module.exports = {
   updateUsername,
   updatePassword,
   updateAvatar,
+  deleteAvatar,
   deleteUser,
 };

@@ -8,9 +8,15 @@ const TaskSchema = new Schema(
       maxlength: 512,
       required: true,
     },
+    purify_title: {
+      type: String,
+    },
     description: {
       type: String,
       maxlength: 10000,
+    },
+    purify_description: {
+      type: String,
     },
     user_id: {
       type: Schema.Types.ObjectId,

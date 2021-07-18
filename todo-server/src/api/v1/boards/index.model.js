@@ -8,9 +8,15 @@ const BoardSchema = new Schema(
       maxlength: 512,
       required: true,
     },
+    purify_title: {
+      type: String,
+    },
     description: {
       type: String,
       maxlength: 10000,
+    },
+    purify_description: {
+      type: String,
     },
     tasks_count: {
       type: Number,
