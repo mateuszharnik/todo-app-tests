@@ -1,8 +1,12 @@
 const Joi = require('joi');
+const { avaratBufferMessages } = require('../../../helpers/validation/messages/avatarBuffer');
+const { avaratSizeMessages } = require('../../../helpers/validation/messages/avatarSize');
+const { mimetypeMessages } = require('../../../helpers/validation/messages/mimetype');
 const { emailMessages } = require('../../../helpers/validation/messages/email');
 const {
   emailRegExp,
   passwordRegExp,
+  mimetypeRegExp,
 } = require('../../../helpers/regexps');
 const {
   createUsernameMessages,
@@ -22,6 +26,28 @@ const validateEmail = (email = {}) => {
   });
 
   const { error: validationError, value: data } = schema.validate(email);
+
+  return { validationError, data };
+};
+
+const validateAvatar = (avatar = {}) => {
+  const schema = Joi.object().keys({
+    mimetype: Joi.string()
+      .trim()
+      .regex(mimetypeRegExp)
+      .lowercase()
+      .messages(mimetypeMessages)
+      .required(),
+    size: Joi.number()
+      .max(5 * 1024 * 1024)
+      .messages(avaratSizeMessages)
+      .required(),
+    buffer: Joi.binary()
+      .messages(avaratBufferMessages)
+      .required(),
+  });
+
+  const { error: validationError, value: data } = schema.validate(avatar);
 
   return { validationError, data };
 };
@@ -83,6 +109,7 @@ const validatePassword = (password = {}) => {
 
 module.exports = {
   validateEmail,
+  validateAvatar,
   validateUsername,
   validatePasswords,
   validatePassword,

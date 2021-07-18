@@ -12,14 +12,18 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    gender: {
+      type: String,
+      required: true,
+    },
     password: {
       type: String,
       maxlength: 1000,
       required: true,
     },
     avatar: {
-      type: String,
-      default: '',
+      data: Buffer,
+      contentType: String,
     },
     deleted_at: {
       type: Date,
