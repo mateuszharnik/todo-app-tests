@@ -5,6 +5,8 @@ const { responseWithError } = require('../helpers/errors');
 const { signToken } = require('../middlewares/auth');
 
 const signUp = async (req, res, next) => {
+  req.body.display_username = req.body.username;
+
   const { validationError, data } = validateSignUpCredentials(req.body);
 
   if (validationError) {
@@ -46,6 +48,7 @@ const signUp = async (req, res, next) => {
     }
 
     const user = {
+      display_username: data.display_username,
       username: data.username,
       email: data.email,
       avatar: '',
@@ -63,6 +66,7 @@ const signUp = async (req, res, next) => {
     const payload = {
       id: createdUser._id,
       username: createdUser.username,
+      display_username: createdUser.display_username,
       email: createdUser.email,
       avatar: createdUser.avatar,
       gender: createdUser.gender,
@@ -95,7 +99,7 @@ const signIn = async (req, res, next) => {
 
   try {
     const user = await User.findOne({
-      $or: [{ username: data.username }, { email: data.email }],
+      $or: [{ username: data.username }, { email: data.username }],
       deleted_at: null,
     });
 
@@ -112,6 +116,7 @@ const signIn = async (req, res, next) => {
     const payload = {
       id: user.id,
       username: user.username,
+      display_username: user.display_username,
       email: user.email,
       avatar: user.avatar,
       gender: user.gender,

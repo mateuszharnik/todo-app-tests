@@ -8,6 +8,7 @@ const {
 const {
   userIdMessages,
 } = require('../../../helpers/validation/messages/userID');
+const { unknownMessages } = require('../../../helpers/validation/messages/unknown');
 
 const validateTask = (task = {}) => {
   const schema = Joi.object().keys({
@@ -33,7 +34,7 @@ const validateTask = (task = {}) => {
       .regex(dbIdRegExp)
       .messages(boardIdMessages)
       .required(),
-  });
+  }).unknown(false).messages(unknownMessages);
 
   const { error: validationError, value: data } = schema.validate(task);
 

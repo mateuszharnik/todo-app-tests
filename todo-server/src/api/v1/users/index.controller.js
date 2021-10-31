@@ -126,6 +126,8 @@ const updateUsername = async (req, res, next) => {
     return responseWithError(res, next, 409, userIdError.details[0].message);
   }
 
+  req.body.display_username = req.body.username;
+
   const { validationError, data } = validateUsername(req.body);
 
   if (validationError) {
@@ -166,7 +168,7 @@ const updateUsername = async (req, res, next) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       _id,
-      { username: data.username },
+      { username: data.username, display_username: data.display_username },
       { new: true },
     ).select('-password');
 
@@ -266,15 +268,6 @@ const updateAvatar = async (req, res, next) => {
     return responseWithError(res, next, 409, userIdError.details[0].message);
   }
 
-  const { avatar = {} } = req.files || {};
-  const { data: buffer, mimetype, size } = avatar;
-
-  req.body = {
-    buffer,
-    mimetype,
-    size,
-  };
-
   const { validationError, data } = validateAvatar(req.body);
 
   if (validationError) {
@@ -302,7 +295,7 @@ const updateAvatar = async (req, res, next) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       _id,
-      { avatar: data.buffer },
+      { avatar: data.avatar },
       { new: true },
     ).select('-password');
 

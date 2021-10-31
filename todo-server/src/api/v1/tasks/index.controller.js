@@ -122,7 +122,7 @@ const createTask = async (req, res, next) => {
     const purify_title = purify(data.title);
     const purify_description = purify(data.description);
 
-    if (!purify_title) {
+    if (data.title && !purify_title) {
       return responseWithError(
         res,
         next,
@@ -131,7 +131,7 @@ const createTask = async (req, res, next) => {
       );
     }
 
-    if (!purify_description) {
+    if (data.description && !purify_description) {
       return responseWithError(
         res,
         next,
@@ -144,6 +144,7 @@ const createTask = async (req, res, next) => {
       ...data,
       purify_title,
       purify_description,
+      done: false,
       deleted_at: null,
     };
 
@@ -215,7 +216,7 @@ const updateTask = async (req, res, next) => {
     const purify_title = purify(data.title);
     const purify_description = purify(data.description);
 
-    if (!purify_title) {
+    if (data.title && !purify_title) {
       return responseWithError(
         res,
         next,
@@ -224,7 +225,7 @@ const updateTask = async (req, res, next) => {
       );
     }
 
-    if (!purify_description) {
+    if (data.description && !purify_description) {
       return responseWithError(
         res,
         next,
@@ -310,10 +311,57 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
+const toggleDone = async (req, res, next) => {
+  const { id: user_id = '' } = req.user || {};
+  const { id: _id = '' } = req.params || {};
+
+  const { validationError: taskIdError } = validateDbId(_id, taskIdMessages);
+
+  if (taskIdError) {
+    return responseWithError(res, next, 409, taskIdError.details[0].message);
+  }
+
+  try {
+    const task = await Task.findOne({ _id, deleted_at: null });
+
+    if (!task) {
+      return responseWithError(res, next, 404, 'Zadanie nie istnieje.');
+    }
+
+    if (task.user_id.toString() !== user_id) {
+      return responseWithError(res, next, 403, 'Brak dostępu.');
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      _id,
+      {
+        done: !task.done,
+      },
+      { new: true },
+    );
+
+    if (!updatedTask) {
+      return responseWithError(
+        res,
+        next,
+        409,
+        'Nie udało się zaktualizować zadania.',
+      );
+    }
+
+    return res.status(200).json(updatedTask);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return responseWithError(res, next, 500, 'Wystąpił błąd.');
+  }
+};
+
 module.exports = {
   getTask,
   getTasks,
   createTask,
   updateTask,
+  toggleDone,
   deleteTask,
 };

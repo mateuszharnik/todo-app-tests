@@ -8,6 +8,10 @@ const TaskSchema = new Schema(
       maxlength: 512,
       required: true,
     },
+    done: {
+      type: Boolean,
+      default: false,
+    },
     purify_title: {
       type: String,
     },

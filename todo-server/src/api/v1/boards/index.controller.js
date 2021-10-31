@@ -75,7 +75,7 @@ const createBoard = async (req, res, next) => {
   const purify_title = purify(data.title);
   const purify_description = purify(data.description);
 
-  if (!purify_title) {
+  if (data.title && !purify_title) {
     return responseWithError(
       res,
       next,
@@ -84,7 +84,7 @@ const createBoard = async (req, res, next) => {
     );
   }
 
-  if (!purify_description) {
+  if (data.description && !purify_description) {
     return responseWithError(
       res,
       next,
@@ -159,7 +159,7 @@ const updateBoard = async (req, res, next) => {
     const purify_title = purify(data.title);
     const purify_description = purify(data.description);
 
-    if (!purify_title) {
+    if (data.title && !purify_title) {
       return responseWithError(
         res,
         next,
@@ -168,7 +168,7 @@ const updateBoard = async (req, res, next) => {
       );
     }
 
-    if (!purify_description) {
+    if (data.description && !purify_description) {
       return responseWithError(
         res,
         next,
