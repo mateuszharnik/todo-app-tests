@@ -8,6 +8,12 @@ const UserSchema = new Schema(
       maxlength: 32,
       required: true,
     },
+    display_username: {
+      type: String,
+      minlength: 3,
+      maxlength: 32,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
@@ -22,8 +28,7 @@ const UserSchema = new Schema(
       required: true,
     },
     avatar: {
-      data: Buffer,
-      contentType: String,
+      type: String,
     },
     deleted_at: {
       type: Date,

@@ -4,7 +4,7 @@ const typeStringMessage = 'Właściwość {#label} musi być typu "string".';
 
 const usernameRequiredMessage = 'Nazwa użytkownika jest wymagana.';
 const usernameMinLengthMessage = 'Nazwa użytkownika musi mieć minimum 3 znaki.';
-const usernameMaxLengthMessage = 'Nazwa użytkownika może mieć maksymalnie 32 znaków.';
+const usernameMaxLengthMessage = 'Nazwa użytkownika może mieć maksymalnie 32 znaki.';
 const usernameAlphanumMessage = 'Nazwa użytkownika może zawierać tylko cyfry i litery.';
 
 const usernameRequired = {

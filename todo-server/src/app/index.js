@@ -1,5 +1,4 @@
 const compression = require('compression');
-const fileuploader = require('express-fileupload');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -20,7 +19,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(helmet());
 app.use(cors({ origin: CLIENT_URL }));
 app.use(checkToken);
-app.use(fileuploader());
 
 app.use('/api', api);
 

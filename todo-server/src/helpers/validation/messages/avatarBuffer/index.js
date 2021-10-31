@@ -2,21 +2,21 @@ const propertyRequiredMessage = 'Właściwość {#label} jest wymagana.';
 
 const typeBinaryMessage = 'Właściwość {#label} musi być typu "binary".';
 
-const avaratBufferRequired = {
+const avatarBufferRequired = {
   'any.required': propertyRequiredMessage,
 };
 
-const avaratBufferBinary = {
+const avatarBufferBinary = {
   'binary.base': typeBinaryMessage,
 };
 
-const avaratBufferMessages = {
-  ...avaratBufferRequired,
-  ...avaratBufferBinary,
+const avatarBufferMessages = {
+  ...avatarBufferRequired,
+  ...avatarBufferBinary,
 };
 
 module.exports = {
-  avaratBufferRequired,
-  avaratBufferBinary,
-  avaratBufferMessages,
+  avatarBufferRequired,
+  avatarBufferBinary,
+  avatarBufferMessages,
 };

@@ -2,29 +2,29 @@ const propertyRequiredMessage = 'Właściwość {#label} jest wymagana.';
 
 const typeNumberMessage = 'Właściwość {#label} musi być typu "number".';
 
-const avatarSizeMaxMessage = 'Awatar może mieć maksymalnie 5 MB.';
+const avatarSizeMaxMessage = 'Awatar może mieć maksymalnie 5MB.';
 
-const avaratSizeRequired = {
+const avatarSizeRequired = {
   'any.required': propertyRequiredMessage,
 };
 
-const avaratSizeNumber = {
+const avatarSizeNumber = {
   'number.base': typeNumberMessage,
 };
 
-const avaratSizeMax = {
+const avatarSizeMax = {
   'number.max': avatarSizeMaxMessage,
 };
 
-const avaratSizeMessages = {
-  ...avaratSizeRequired,
-  ...avaratSizeNumber,
-  ...avaratSizeMax,
+const avatarSizeMessages = {
+  ...avatarSizeRequired,
+  ...avatarSizeNumber,
+  ...avatarSizeMax,
 };
 
 module.exports = {
-  avaratSizeMax,
-  avaratSizeRequired,
-  avaratSizeNumber,
-  avaratSizeMessages,
+  avatarSizeMax,
+  avatarSizeRequired,
+  avatarSizeNumber,
+  avatarSizeMessages,
 };

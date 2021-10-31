@@ -1,29 +1,40 @@
 const Joi = require('joi');
-const { avaratBufferMessages } = require('../../../helpers/validation/messages/avatarBuffer');
-const { avaratSizeMessages } = require('../../../helpers/validation/messages/avatarSize');
-const { mimetypeMessages } = require('../../../helpers/validation/messages/mimetype');
 const { emailMessages } = require('../../../helpers/validation/messages/email');
+const {
+  passwordMessages,
+} = require('../../../helpers/validation/messages/password');
+const {
+  confirmPasswordMessages,
+} = require('../../../helpers/validation/messages/confirmPassword');
+const {
+  unknownMessages,
+} = require('../../../helpers/validation/messages/unknown');
+const {
+  newPasswordMessages,
+} = require('../../../helpers/validation/messages/newPassword');
+const {
+  createUsernameMessages,
+} = require('../../../helpers/validation/messages/username');
+const {
+  avatarMessages,
+} = require('../../../helpers/validation/messages/avatar');
 const {
   emailRegExp,
   passwordRegExp,
-  mimetypeRegExp,
 } = require('../../../helpers/regexps');
-const {
-  createUsernameMessages,
-  createPasswordMessages,
-  passwordMessages,
-  confirmPasswordMessages,
-} = require('../../../helpers/validation/messages');
 
 const validateEmail = (email = {}) => {
-  const schema = Joi.object().keys({
-    email: Joi.string()
-      .trim()
-      .regex(emailRegExp)
-      .lowercase()
-      .messages(emailMessages)
-      .required(),
-  });
+  const schema = Joi.object()
+    .keys({
+      email: Joi.string()
+        .trim()
+        .regex(emailRegExp)
+        .lowercase()
+        .messages(emailMessages)
+        .required(),
+    })
+    .unknown(false)
+    .messages(unknownMessages);
 
   const { error: validationError, value: data } = schema.validate(email);
 
@@ -31,21 +42,13 @@ const validateEmail = (email = {}) => {
 };
 
 const validateAvatar = (avatar = {}) => {
-  const schema = Joi.object().keys({
-    mimetype: Joi.string()
-      .trim()
-      .regex(mimetypeRegExp)
-      .lowercase()
-      .messages(mimetypeMessages)
-      .required(),
-    size: Joi.number()
-      .max(5 * 1024 * 1024)
-      .messages(avaratSizeMessages)
-      .required(),
-    buffer: Joi.binary()
-      .messages(avaratBufferMessages)
-      .required(),
-  });
+  const schema = Joi.object()
+    .keys({
+      avatar: Joi.string().trim().uri().messages(avatarMessages)
+        .required(),
+    })
+    .unknown(false)
+    .messages(unknownMessages);
 
   const { error: validationError, value: data } = schema.validate(avatar);
 
@@ -53,16 +56,26 @@ const validateAvatar = (avatar = {}) => {
 };
 
 const validateUsername = (username = {}) => {
-  const schema = Joi.object().keys({
-    username: Joi.string()
-      .trim()
-      .min(3)
-      .max(32)
-      .lowercase()
-      .alphanum()
-      .messages(createUsernameMessages)
-      .required(),
-  });
+  const schema = Joi.object()
+    .keys({
+      username: Joi.string()
+        .trim()
+        .min(3)
+        .max(32)
+        .lowercase()
+        .alphanum()
+        .messages(createUsernameMessages)
+        .required(),
+      display_username: Joi.string()
+        .trim()
+        .min(3)
+        .max(32)
+        .alphanum()
+        .messages(createUsernameMessages)
+        .required(),
+    })
+    .unknown(false)
+    .messages(unknownMessages);
 
   const { error: validationError, value: data } = schema.validate(username);
 
@@ -70,24 +83,25 @@ const validateUsername = (username = {}) => {
 };
 
 const validatePasswords = (passwords = {}) => {
-  const schema = Joi.object().keys({
-    password: Joi.string()
-      .trim()
-      .messages(passwordMessages)
-      .required(),
-    new_password: Joi.string()
-      .trim()
-      .min(8)
-      .max(32)
-      .regex(passwordRegExp)
-      .messages(createPasswordMessages)
-      .required(),
-    confirm_password: Joi.string()
-      .trim()
-      .valid(Joi.ref('new_password'))
-      .messages(confirmPasswordMessages)
-      .required(),
-  });
+  const schema = Joi.object()
+    .keys({
+      password: Joi.string().trim().messages(passwordMessages).required(),
+      new_password: Joi.string()
+        .trim()
+        .min(8)
+        .max(32)
+        .regex(passwordRegExp)
+        .invalid(Joi.ref('password'))
+        .messages(newPasswordMessages)
+        .required(),
+      confirm_password: Joi.string()
+        .trim()
+        .valid(Joi.ref('new_password'))
+        .messages(confirmPasswordMessages)
+        .required(),
+    })
+    .unknown(false)
+    .messages(unknownMessages);
 
   const { error: validationError, value: data } = schema.validate(passwords);
 
@@ -95,12 +109,12 @@ const validatePasswords = (passwords = {}) => {
 };
 
 const validatePassword = (password = {}) => {
-  const schema = Joi.object().keys({
-    password: Joi.string()
-      .trim()
-      .messages(passwordMessages)
-      .required(),
-  });
+  const schema = Joi.object()
+    .keys({
+      password: Joi.string().trim().messages(passwordMessages).required(),
+    })
+    .unknown(false)
+    .messages(unknownMessages);
 
   const { error: validationError, value: data } = schema.validate(password);
 
