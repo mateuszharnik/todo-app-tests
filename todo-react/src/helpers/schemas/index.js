@@ -14,7 +14,7 @@ export const signUpSchema = Yup.object().shape({
   username: Yup.string()
     .trim()
     .min(3, 'Nazwa użytkownika musi mieć minimum 3 znaki.')
-    .max(32, 'Nazwa użytkownika może mieć maksymalnie 32 znaków.')
+    .max(32, 'Nazwa użytkownika może mieć maksymalnie 32 znaki.')
     .matches(
       alphanumRegExp,
       'Nazwa użytkownika może zawierać tylko cyfry i litery.',
@@ -40,7 +40,7 @@ export const signUpSchema = Yup.object().shape({
     .required('Hasło jest wymagane.'),
   confirm_password: Yup.string()
     .trim()
-    .oneOf([Yup.ref('password'), null], 'Hasła nie są takie same.')
+    .oneOf([Yup.ref('password')], 'Hasła nie są takie same.')
     .required('Musisz powtórzyć hasło.'),
   terms_of_use_accepted: Yup.boolean()
     .oneOf([true], 'Musisz zaakceptować regulamin.')

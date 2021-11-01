@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
-import PropTypes, { shape } from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
 import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
@@ -10,10 +11,14 @@ import {
 import AuthWrapper from '../../components/AuthWrapper';
 import AuthPage from '../../components/AuthPage';
 import Alert from '../../components/Alert';
+import {
+  StyledAuthPageWrapper,
+  StyledAuthPageTitle,
+} from '../../styles/AuthPage';
 import setTitle from '../../helpers/title';
-import { getToken, setToken } from '../../helpers/token';
+import { getToken } from '../../helpers/token';
 import { signInSchema } from '../../helpers/schemas';
-import { signInUser } from '../../helpers/api/auth';
+import { signInUserAction } from '../../store/auth/actions';
 
 class SignIn extends Component {
   constructor(props) {
@@ -23,32 +28,27 @@ class SignIn extends Component {
       responseMessage: '',
     };
 
-    this.sendForm = this.sendForm.bind(this);
+    this.handleSubmitForm = this.handleSubmitForm.bind(this);
   }
 
   componentDidMount() {
-    setTitle('Zaloguj się');
+    const title = 'Zaloguj się';
+    const token = getToken();
 
-    if (getToken()) {
+    setTitle({ title });
+
+    if (token) {
       this.redirectToHomePage();
     }
   }
 
-  redirectToHomePage() {
-    const { history = {} } = this.props;
+  async handleSubmitForm(value = {}, { setSubmitting }) {
+    const { signInUser } = this.props;
 
-    history.push('/');
-  }
-
-  async sendForm(value = {}, { setSubmitting }) {
     setSubmitting(true);
 
     try {
-      const { data } = await signInUser({ data: value });
-
-      if (data) {
-        setToken(data.token);
-      }
+      await signInUser({ data: value });
 
       this.redirectToHomePage();
     } catch (error) {
@@ -62,6 +62,12 @@ class SignIn extends Component {
     }
   }
 
+  redirectToHomePage() {
+    const { history = {} } = this.props;
+
+    history.push('/');
+  }
+
   render() {
     const { responseMessage } = this.state;
 
@@ -71,11 +77,11 @@ class SignIn extends Component {
           <h2>Strona logowania</h2>
         </header>
         <AuthPage>
-          <div className="auth-page__wrapper container">
+          <StyledAuthPageWrapper className="container">
             <header className="row">
-              <h4 className="col s12 auth-page__title center-align">
+              <StyledAuthPageTitle className="col s12 center-align">
                 Zaloguj się
-              </h4>
+              </StyledAuthPageTitle>
             </header>
             <div className="row">
               <Formik
@@ -84,7 +90,7 @@ class SignIn extends Component {
                   password: '',
                 }}
                 validationSchema={signInSchema}
-                onSubmit={this.sendForm}
+                onSubmit={this.handleSubmitForm}
               >
                 {({ errors, touched, isSubmitting }) => (
                   <Form className="col s12">
@@ -159,7 +165,7 @@ class SignIn extends Component {
                 .
               </div>
             </div>
-          </div>
+          </StyledAuthPageWrapper>
         </AuthPage>
       </AuthWrapper>
     );
@@ -167,9 +173,14 @@ class SignIn extends Component {
 }
 
 SignIn.propTypes = {
-  history: shape({
+  history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
+  signInUser: PropTypes.func.isRequired,
 };
 
-export default withRouter(SignIn);
+const mapDispatchToProps = (dispatch) => ({
+  signInUser: ({ data }) => dispatch(signInUserAction({ data })),
+});
+
+export default withRouter(connect(null, mapDispatchToProps)(SignIn));

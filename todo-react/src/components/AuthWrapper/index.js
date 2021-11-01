@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import StyledAuthWrapper from '../../styles/AuthWrapper';
 
 const AuthWrapper = ({ children }) => (
-  <div className="auth-wrapper">{children}</div>
+  <StyledAuthWrapper>{children}</StyledAuthWrapper>
 );
 
 AuthWrapper.propTypes = {

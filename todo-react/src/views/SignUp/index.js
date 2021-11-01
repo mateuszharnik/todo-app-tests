@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import PropTypes, { shape } from 'prop-types';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
@@ -9,12 +10,15 @@ import {
 } from 'formik';
 import AuthWrapper from '../../components/AuthWrapper';
 import AuthPage from '../../components/AuthPage';
-
 import Alert from '../../components/Alert';
-import { signUpSchema } from '../../helpers/schemas';
-import { getToken, setToken } from '../../helpers/token';
+import {
+  StyledAuthPageWrapper,
+  StyledAuthPageTitle,
+} from '../../styles/AuthPage';
 import setTitle from '../../helpers/title';
-import { signUpUser } from '../../helpers/api/auth';
+import { getToken } from '../../helpers/token';
+import { signUpSchema } from '../../helpers/schemas';
+import { signUpUserAction } from '../../store/auth/actions';
 
 class SignUp extends Component {
   constructor(props) {
@@ -24,32 +28,27 @@ class SignUp extends Component {
       responseMessage: '',
     };
 
-    this.sendForm = this.sendForm.bind(this);
+    this.handleSubmitForm = this.handleSubmitForm.bind(this);
   }
 
   componentDidMount() {
-    setTitle('Zarejestruj się');
+    const title = 'Zarejestruj się';
+    const token = getToken();
 
-    if (getToken()) {
+    setTitle({ title });
+
+    if (token) {
       this.redirectToHomePage();
     }
   }
 
-  redirectToHomePage() {
-    const { history = {} } = this.props;
+  async handleSubmitForm(value = {}, { setSubmitting }) {
+    const { signUpUser } = this.props;
 
-    history.push('/');
-  }
-
-  async sendForm(value = {}, { setSubmitting }) {
     setSubmitting(true);
 
     try {
-      const { data } = await signUpUser({ data: value });
-
-      if (data) {
-        setToken(data.token);
-      }
+      await signUpUser({ data: value });
 
       this.redirectToHomePage();
     } catch (error) {
@@ -63,6 +62,12 @@ class SignUp extends Component {
     }
   }
 
+  redirectToHomePage() {
+    const { history = {} } = this.props;
+
+    history.push('/');
+  }
+
   render() {
     const { responseMessage } = this.state;
 
@@ -72,11 +77,11 @@ class SignUp extends Component {
           <h2>Strona rejestracji nowego konta</h2>
         </header>
         <AuthPage>
-          <div className="auth-page__wrapper container">
+          <StyledAuthPageWrapper className="container">
             <header className="row">
-              <h4 className="col s12 auth-page__title center-align">
+              <StyledAuthPageTitle className="col s12 center-align">
                 Zarejestruj się
-              </h4>
+              </StyledAuthPageTitle>
             </header>
             <div className="row">
               <Formik
@@ -89,7 +94,7 @@ class SignUp extends Component {
                   terms_of_use_accepted: false,
                 }}
                 validationSchema={signUpSchema}
-                onSubmit={this.sendForm}
+                onSubmit={this.handleSubmitForm}
               >
                 {({ errors, touched, isSubmitting }) => (
                   <Form className="col s12">
@@ -125,6 +130,9 @@ class SignUp extends Component {
                           name="email"
                           className="helper-text helper-text__error"
                         />
+                        <span className="helper-text">
+                          Spokojnie, ten adres email nie musi nawet istnieć.
+                        </span>
                       </div>
                       <div className="input-field col s12">
                         <Field
@@ -260,7 +268,7 @@ class SignUp extends Component {
                 .
               </div>
             </div>
-          </div>
+          </StyledAuthPageWrapper>
         </AuthPage>
       </AuthWrapper>
     );
@@ -268,9 +276,14 @@ class SignUp extends Component {
 }
 
 SignUp.propTypes = {
-  history: shape({
+  history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
+  signUpUser: PropTypes.func.isRequired,
 };
 
-export default withRouter(SignUp);
+const mapDispatchToProps = (dispatch) => ({
+  signUpUser: ({ data }) => dispatch(signUpUserAction({ data })),
+});
+
+export default withRouter(connect(null, mapDispatchToProps)(SignUp));
