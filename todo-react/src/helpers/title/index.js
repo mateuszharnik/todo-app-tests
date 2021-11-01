@@ -1,4 +1,4 @@
-const setTitle = (title = '') => {
+const setTitle = ({ title = '' }) => {
   document.title = `${title} | Todo App`;
 };
 

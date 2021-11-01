@@ -2,14 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleNotch } from '@fortawesome/free-solid-svg-icons';
+import StyledSpinner from '../../styles/Spinner';
 
 const Spinner = ({ size, center }) => {
-  const spinnerClass = center ? 'spinner center' : 'spinner';
+  const spinnerClass = center ? 'center' : '';
 
   return (
-    <div className={spinnerClass}>
+    <StyledSpinner className={spinnerClass}>
       <FontAwesomeIcon icon={faCircleNotch} size={size} spin />
-    </div>
+    </StyledSpinner>
   );
 };
 

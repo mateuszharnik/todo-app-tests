@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { StyledAuthPage } from '../../styles/AuthPage';
 
 const AuthPage = ({ children }) => (
-  <section className="auth-page">{children}</section>
+  <StyledAuthPage>{children}</StyledAuthPage>
 );
 
 AuthPage.propTypes = {

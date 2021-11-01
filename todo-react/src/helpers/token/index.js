@@ -1,4 +1,4 @@
-export const decodeToken = (token = '') => {
+export const decodeToken = ({ token = '' }) => {
   let decodedToken = {};
 
   if (token) {
@@ -12,6 +12,6 @@ export const decodeToken = (token = '') => {
 
 export const getToken = () => JSON.parse(window.localStorage.getItem('token')) || '';
 
-export const setToken = (token = '') => window.localStorage.setItem('token', JSON.stringify(token));
+export const setToken = ({ token = '' }) => window.localStorage.setItem('token', JSON.stringify(token));
 
 export const removeToken = () => window.localStorage.removeItem('token');

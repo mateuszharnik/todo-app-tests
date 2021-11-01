@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { StyledAlert } from '../../styles/Alert';
 
 const Alert = ({ children, type = 'danger' }) => (
-  <div className={`center-align alert alert__${type}`}>{children}</div>
+  <StyledAlert type={type} className="center-align">
+    {children}
+  </StyledAlert>
 );
 
 Alert.propTypes = {
